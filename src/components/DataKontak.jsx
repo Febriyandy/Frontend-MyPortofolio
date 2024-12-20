@@ -10,7 +10,7 @@ const DataKontak = () => {
   const getKontak = async () => {
     try {
       const response = await axios.get(
-        "https://api.portofolio.febriyandy.xyz/kontak"
+        `${import.meta.env.VITE_API_URL}/kontak`
       );
       setKontak(response.data);
     } catch (error) {
@@ -33,7 +33,7 @@ const DataKontak = () => {
 
       if (result.isConfirmed) {
         await axios.delete(
-          `https://api.portofolio.febriyandy.xyz/kontak/${id}`
+          `${import.meta.env.VITE_API_URL}/kontak/${id}`
         );
         getKontak();
         Swal.fire("Terhapus!", "Data berhasil dihapus.", "success");

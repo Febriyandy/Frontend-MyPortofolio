@@ -29,7 +29,7 @@ const TambahDataSkill = ({ showForm, toggleCloseForm }) => {
       formData.append("foto", foto);
 
       await axios.post(
-        "https://api.portofolio.febriyandy.xyz/tambahskill",
+        `${import.meta.env.VITE_API_URL}/tambahskill`,
         formData
       );
       Swal.fire({

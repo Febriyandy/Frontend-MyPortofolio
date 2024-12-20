@@ -20,7 +20,7 @@ const EditSkill = ({ showForm, toggleCloseForm, skillId }) => {
 
     const getSkillById = async () => {
         try {
-            const response = await axios.get(`https://api.portofolio.febriyandy.xyz/skill/${skillId}`);
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/skill/${skillId}`);
             if (response.data) {
                 const data = response.data;
 
@@ -54,7 +54,7 @@ const EditSkill = ({ showForm, toggleCloseForm, skillId }) => {
             formData.append("foto", foto);
 
             await axios.patch(
-                `https://api.portofolio.febriyandy.xyz/updateskill/${skillId}`,
+                `${import.meta.env.VITE_API_URL}/updateskill/${skillId}`,
                 formData
             );
             Swal.fire({

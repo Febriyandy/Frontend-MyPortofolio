@@ -7,7 +7,7 @@ const Sertifikat = () => {
   const getSertifikat = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7800/sertifikat"
+        `${import.meta.env.VITE_API_URL}/sertifikat`
       );
       setSertifikat(response.data);
     } catch (error) {

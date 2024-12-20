@@ -13,7 +13,7 @@ const DataSkill = () => {
 
     const getSkill = async () => {
         try {
-            const response = await axios.get("https://api.portofolio.febriyandy.xyz/skill");
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/skill`);
             setSkill(response.data);
         } catch (error) {
             console.error("Error fetching skill data:", error);
@@ -34,7 +34,7 @@ const DataSkill = () => {
           });
     
           if (result.isConfirmed) {
-            await axios.delete(`https://api.portofolio.febriyandy.xyz/deleteskill/${id}`);
+            await axios.delete(`${import.meta.env.VITE_API_URL}/deleteskill/${id}`);
             getSkill();
             Swal.fire("Terhapus!", "Data berhasil dihapus.", "success");
           }

@@ -44,7 +44,7 @@ const TambahDataSertifikat = ({ showForm, toggleCloseForm }) => {
       formData.append("foto", foto);
 
       await axios.post(
-        "https://api.portofolio.febriyandy.xyz/tambahsertifikat",
+        `${import.meta.env.VITE_API_URL}/tambahsertifikat`,
         formData
       );
       Swal.fire({

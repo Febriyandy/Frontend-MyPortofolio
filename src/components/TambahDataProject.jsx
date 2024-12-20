@@ -56,7 +56,7 @@ const TambahDataProject = ({ showForm, toggleCloseForm }) => {
       formData.append("foto", foto);
   
       await axios.post(
-        "https://api.portofolio.febriyandy.xyz/tambahproject",
+        `${import.meta.env.VITE_API_URL}/tambahproject`,
         formData
       );
       Swal.fire({

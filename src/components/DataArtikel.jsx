@@ -13,7 +13,7 @@ const DataArtikel = () => {
   const getArtikel = async () => {
     try {
       const response = await axios.get(
-        "https://api.portofolio.febriyandy.xyz/artikel"
+        `${import.meta.env.VITE_API_URL}/artikel`
       );
       setArtikel(response.data);
     } catch (error) {
@@ -36,7 +36,7 @@ const DataArtikel = () => {
 
       if (result.isConfirmed) {
         await axios.delete(
-          `https://api.portofolio.febriyandy.xyz/deleteartikel/${id}`
+          `${import.meta.env.VITE_API_URL}/deleteartikel/${id}`
         );
         getArtikel();
         Swal.fire("Terhapus!", "Data berhasil dihapus.", "success");

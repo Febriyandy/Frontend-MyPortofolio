@@ -14,7 +14,7 @@ const DataProject = () => {
   const getProject = async () => {
     try {
       const response = await axios.get(
-        "https://api.portofolio.febriyandy.xyz/project"
+        `${import.meta.env.VITE_API_URL}/project`
       );
       setProject(response.data);
     } catch (error) {
@@ -37,7 +37,7 @@ const DataProject = () => {
 
       if (result.isConfirmed) {
         await axios.delete(
-          `https://api.portofolio.febriyandy.xyz/deleteproject/${id}`
+          `${import.meta.env.VITE_API_URL}/deleteproject/${id}`
         );
         getProject();
         Swal.fire("Terhapus!", "Data berhasil dihapus.", "success");

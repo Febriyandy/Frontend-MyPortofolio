@@ -22,7 +22,7 @@ const EditProject = ({ showForm, toggleCloseForm, projectId }) => {
 
   const getProjectById = async () => {
     try {
-      const response = await axios.get(`https://api.portofolio.febriyandy.xyz/project/${projectId}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/project/${projectId}`);
       if (response.data) {
         const data = response.data;
 
@@ -87,7 +87,7 @@ const EditProject = ({ showForm, toggleCloseForm, projectId }) => {
       formData.append("foto", foto);
 
       await axios.patch(
-        `https://api.portofolio.febriyandy.xyz/updateproject/${projectId}`,
+        `${import.meta.env.VITE_API_URL}/updateproject/${projectId}`,
         formData
       );
       Swal.fire({

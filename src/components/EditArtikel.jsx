@@ -21,7 +21,7 @@ const EditArtikel = ({ showForm, toggleCloseForm, artikelId }) => {
   
   const getArtikelById = async () => {
     try {
-      const response = await axios.get(`https://api.portofolio.febriyandy.xyz/artikel/${artikelId}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/artikel/${artikelId}`);
       if (response.data) {
         const data = response.data;
         const isi = parseAndReplaceNewlines(data.isi || "");
@@ -73,7 +73,7 @@ const EditArtikel = ({ showForm, toggleCloseForm, artikelId }) => {
       formData.append("foto", foto);
 
       await axios.patch(
-        `https://api.portofolio.febriyandy.xyz/updateartikel/${artikelId}`,
+        `${import.meta.env.VITE_API_URL}/updateartikel/${artikelId}`,
         formData
       );
       Swal.fire({

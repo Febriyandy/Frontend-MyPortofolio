@@ -12,7 +12,7 @@ const Artikel = () => {
   const getArtikel = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7800/artikel"
+        `${import.meta.env.VITE_API_URL}/artikel`
       );
       setArtikel(response.data);
     } catch (error) {

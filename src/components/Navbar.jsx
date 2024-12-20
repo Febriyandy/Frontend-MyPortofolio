@@ -30,7 +30,7 @@ const Navbar = () => {
           </button>
         </div>
         {menuOpen && (
-          <div className="w-full h-auto bg-white/40 backdrop-filter  backdrop-blur-sm shadow-sm fixed z-[100] ">
+          <div className="w-full h-auto  bg-white/40 backdrop-filter  backdrop-blur-sm shadow-sm fixed z-[100] ">
             <div className="h-16"></div>
             <Link to="/home">
               <div className="w-full font-semibold border-b border-[#0d6c91] hover:bg-white duration-300 text-lg text-[#0d6c91]  font-body  py-5 px-5">
@@ -51,7 +51,7 @@ const Navbar = () => {
           </div>
         )}
       </nav>
-      <nav className="absolute max-md:hidden top-0 left-0 right-0 mt-5 w-1/2 h-16 animate__animated animate__fadeInDown bg-white/40 backdrop-filter backdrop-blur-sm shadow-sm rounded-full z-[1000] mx-auto flex justify-center items-center hover:shadow-xl duration-500">
+      <nav className=" fixed max-md:hidden top-0 left-0 right-0 mt-5 w-1/2 h-16 animate__animated animate__fadeInDown bg-white/40 backdrop-filter backdrop-blur-sm shadow-sm rounded-full z-[1000] mx-auto flex justify-center items-center hover:shadow-xl duration-500">
         <div className="flex justify-between ">
           {navigationItems.map((navItem, index) => (
             <Link

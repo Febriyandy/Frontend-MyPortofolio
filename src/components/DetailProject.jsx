@@ -33,7 +33,7 @@ const DetailProject = ({ showForm, toggleCloseForm, projectId }) => {
 
   const getProjectById = async () => {
     try {
-      const response = await axios.get(`http://localhost:7800/project/${projectId}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/project/${projectId}`);
       if (response.data) {
         setProject(response.data);
       }
@@ -82,7 +82,7 @@ const DetailProject = ({ showForm, toggleCloseForm, projectId }) => {
             <div className="flex mt-4 gap-2 md:gap-3 max-md:justify-between">
             <Link
                 to={project.link_github}
-                className="flex duration-300 font-body py-1 px-1 md:px-5 bg-white border border-[#0D6B91] hover:bg-[#082F44] hover:text-white text-[#0D6B91] rounded-md shadow-md gap-3 text-lg items-center"
+                className="flex duration-300 font-body py-1 px-2 md:px-5 bg-white border border-[#0D6B91] hover:bg-[#082F44] hover:text-white text-[#0D6B91] rounded-md shadow-md gap-3 text-lg items-center"
                 target="_blank"
                 rel="noopener noreferrer"
               >

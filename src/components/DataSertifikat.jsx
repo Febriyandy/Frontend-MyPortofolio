@@ -13,7 +13,7 @@ const DataSertifikat = () => {
   const getSertifikat = async () => {
     try {
       const response = await axios.get(
-        "https://api.portofolio.febriyandy.xyz/sertifikat"
+        `${import.meta.env.VITE_API_URL}/sertifikat`
       );
       setSertifikat(response.data);
     } catch (error) {
@@ -36,7 +36,7 @@ const DataSertifikat = () => {
 
       if (result.isConfirmed) {
         await axios.delete(
-          `https://api.portofolio.febriyandy.xyz/deletesertifikat/${id}`
+          `${import.meta.env.VITE_API_URL}/deletesertifikat/${id}`
         );
         getSertifikat();
         Swal.fire("Terhapus!", "Data berhasil dihapus.", "success");

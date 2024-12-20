@@ -32,7 +32,7 @@ const TambahDataArtikel = ({ showForm, toggleCloseForm }) => {
       formData.append("foto", foto);
 
       await axios.post(
-        "https://api.portofolio.febriyandy.xyz/tambahartikel",
+        `${import.meta.env.VITE_API_URL}/tambahartikel`,
         formData
       );
       Swal.fire({

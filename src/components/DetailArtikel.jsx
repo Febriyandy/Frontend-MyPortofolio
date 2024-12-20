@@ -14,7 +14,7 @@ const DetailArtikel = () => {
   const getArtikelById = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:7800/artikel/${id}`
+        `${import.meta.env.VITE_API_URL}/artikel/${id}`
       );
       setArtikel(response.data);
     } catch (error) {
@@ -25,7 +25,7 @@ const DetailArtikel = () => {
   const getOtherArtikel = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7800/artikel"
+        `${import.meta.env.VITE_API_URL}/artikel`
       );
       setOtherArtikel(response.data.filter(item => item.id !== parseInt(id)).slice(0, 3));
     } catch (error) {

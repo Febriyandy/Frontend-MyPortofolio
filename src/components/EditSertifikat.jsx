@@ -32,7 +32,7 @@ const EditSertifikat = ({ showForm, toggleCloseForm, sertifikatId }) => {
   
   const getSertifikatById = async () => {
     try {
-      const response = await axios.get(`https://api.portofolio.febriyandy.xyz/sertifikat/${sertifikatId}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/sertifikat/${sertifikatId}`);
       if (response.data) {
         const data = response.data;
         const deskripsi = parseAndReplaceNewlines(data.deskripsi || "");
@@ -90,7 +90,7 @@ const EditSertifikat = ({ showForm, toggleCloseForm, sertifikatId }) => {
       formData.append("foto", foto);
 
       await axios.patch(
-        `https://api.portofolio.febriyandy.xyz/updatesertifikat/${sertifikatId}`,
+        `${import.meta.env.VITE_API_URL}/updatesertifikat/${sertifikatId}`,
         formData
       );
       Swal.fire({

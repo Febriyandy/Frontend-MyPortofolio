@@ -11,6 +11,8 @@ import DataSertifikat from "../components/DataSertifikat";
 import TambahDataArtikel from "../components/TambahDataArtikel";
 import DataArtikel from "../components/DataArtikel";
 import DataKontak from "../components/DataKontak";
+import { BiLogOut } from "react-icons/bi";
+
 
 const Admin = () => {
   const [token, setToken] = useState("");
@@ -21,21 +23,29 @@ const Admin = () => {
   const [showForm3, setShowForm3] = useState(false);
   const navigate = useNavigate();
 
+  const refreshToken = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/token`);
+      setToken(response.data.accessToken);
+      const decoded = jwt_decode(response.data.accessToken);
+      setExpire(decoded.exp);
+    } catch (error) {
+      if (error.response) {
+        navigate("/login");
+      }
+    }
+  };
+
   const axiosJWT = axios.create();
 
   axiosJWT.interceptors.request.use(
     async (config) => {
       const currentDate = new Date();
       if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get(
-          "https://api.portofolio.febriyandy.xyz/token",
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/token`);
         config.headers.Authorization = `Bearer ${response.data.accessToken}`;
         setToken(response.data.accessToken);
-        const decoded = jwtDecode(response.data.accessToken);
+        const decoded = jwt_decode(response.data.accessToken);
         setExpire(decoded.exp);
       }
       return config;
@@ -47,7 +57,17 @@ const Admin = () => {
 
   useEffect(() => {
     document.title = "Admin";
+    refreshToken();
   }, []);
+
+  const Logout = async () => {
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/logout`);
+      navigate("/login");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const toggleForm = () => {
     setShowForm(!showForm);
@@ -84,6 +104,12 @@ const Admin = () => {
   return (
     <>
       <section className="flex font-body flex-col justify-center items-center">
+      <button
+              onClick={Logout}
+              className="bg-[#0D6B91] py-2 px-10 mt-10 text-white text-lg rounded-md shadow-md hover:bg-[#15a4dd]"
+            >
+              Logout
+            </button>
         <h1 className="text-3xl font-bold text-[#0D6B91] pt-10">
           Selamat Datang di Admin Portofolio Febriandi
         </h1>

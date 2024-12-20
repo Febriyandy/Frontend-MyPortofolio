@@ -39,7 +39,7 @@ const Project = () => {
   const getProject = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:7800/project"
+        `${import.meta.env.VITE_API_URL}/project`
       );
       setProjects(response.data);
     } catch (error) {
@@ -122,12 +122,12 @@ const Project = () => {
             <div className="flex mt-4 gap-3 justify-between">
               <button
               onClick={() => toggleForm(project.id)}
-               className="flex font-body duration-300 py-1 px-3 md:px-5 bg-[#0D6B91] border border-[#0D6B91] hover:bg-[#082F44] text-white rounded-md shadow-md gap-3 text-lg items-center">
+               className="flex font-body duration-300 py-1 px-4 md:px-5 bg-[#0D6B91] border border-[#0D6B91] hover:bg-[#082F44] text-white rounded-md shadow-md gap-3 text-lg items-center">
                 Details <BsArrowRightSquareFill />
               </button>
               <Link
                 to={project.link_preview}
-                className="flex font-body duration-300 py-1 px-3 md:px-5 bg-white border border-[#0D6B91] hover:bg-[#082F44] hover:text-white text-[#0D6B91] rounded-md shadow-md gap-3 text-lg items-center"
+                className="flex font-body duration-300 py-1 px-4 md:px-5 bg-white border border-[#0D6B91] hover:bg-[#082F44] hover:text-white text-[#0D6B91] rounded-md shadow-md gap-3 text-lg items-center"
                 target="_blank"
                 rel="noopener noreferrer"
               >

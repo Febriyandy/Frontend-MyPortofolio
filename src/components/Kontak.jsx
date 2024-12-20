@@ -33,7 +33,7 @@ const Kontak = () => {
       formData.append("perusahaan", perusahaan);
       formData.append("pesan", pesan);
 
-      await axios.post(`https://api.portofolio.febriyandy.xyz/kontak`, formData);
+      await axios.post(`${import.meta.env.VITE_API_URL}/kontak`, formData);
       Swal.fire({
         icon: "success",
         title: "Pesan Terkirim!",
