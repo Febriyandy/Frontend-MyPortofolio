@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { BsArrowRightSquareFill } from "react-icons/bs";
+import DetailSertifikat from "./DetailSertifikat";
 
 const Sertifikat = () => {
   const [sertifikat, setSertifikat] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [selectedSertifikatId, setSelectedSertifikatId] = useState(null);
+  const [showAll, setShowAll] = useState(false);
 
   const getSertifikat = async () => {
     try {
@@ -11,7 +16,7 @@ const Sertifikat = () => {
       );
       setSertifikat(response.data);
     } catch (error) {
-      console.error("Error fetching skill data:", error);
+      console.error("Error fetching sertifikat data:", error);
     }
   };
 
@@ -19,7 +24,20 @@ const Sertifikat = () => {
     getSertifikat();
   }, []);
 
-  // Function to convert hex color to rgba with opacity
+  const toggleForm = (id) => {
+    setSelectedSertifikatId(id);
+    setShowForm(true);
+  };
+
+  const toggleCloseForm = () => {
+    setShowForm(false);
+    setSelectedSertifikatId(null);
+  };
+
+  const displayedSertifikat = window.innerWidth < 768 && !showAll 
+    ? sertifikat.slice(0, 3) 
+    : sertifikat;
+
   const hexToRgba = (hex, opacity) => {
     let r = parseInt(hex.slice(1, 3), 16);
     let g = parseInt(hex.slice(3, 5), 16);
@@ -29,32 +47,35 @@ const Sertifikat = () => {
 
   return (
     <div className="container w-full mx-auto h-auto py-10 bg-transparent">
-      <h1 data-aos="fade-down"
-     data-aos-duration="2000" className="md:text-3xl text-xl max-md:px-5 text-white font-body font-bold text-center mb-8">
-        <span  role="img" aria-label="target">
-          🏢{" "}
-        </span>
+      <h1 
+        data-aos="fade-down"
+        data-aos-duration="2000" 
+        className="md:text-3xl text-xl max-md:px-5 md:mt-16 text-white font-body font-bold text-center mb-8"
+      >
+        <span role="img" aria-label="target">🏢 </span>
         Certificate and Work Experiences
       </h1>
-      {sertifikat.map((sertifikat, index) => (
-        <div
+      <div 
         data-aos="fade-up"
-     data-aos-duration="2000"
-          key={index}
-          className="w-5/6 h-auto my-10 md:flex mx-auto rounded-xl border-4"
-          style={{
-            backgroundColor: hexToRgba(sertifikat.color, 0.3),
-            borderColor: sertifikat.color,
-          }}
-        >
-          <div className="md:w-1/2 h-full md:my-10 m-5 md:mx-10">
-            <div className="md:flex gap-5 items-center">
+        data-aos-duration="2000" 
+        className="flex justify-center gap-12 flex-wrap"
+      >
+        {displayedSertifikat.map((sertifikat) => (
+          <div
+            key={sertifikat.id}
+            className="md:w-[330px] w-4/5 border-2 h-auto rounded-xl shadow-lg p-5"
+            style={{
+              backgroundColor: hexToRgba(sertifikat.color, 0.3),
+              borderColor: sertifikat.color,
+            }}
+          >
+            <figure className="relative group">
               <img
-                src={sertifikat.link_icon}
-                className="w-36  rounded-md"
-                alt=""
+                src={sertifikat.link_foto}
+                className="md:w-[330px] border border-[#0D6B91] h-auto rounded-md object-cover"
+                alt={sertifikat.name}
               />
-              <div className="max-md:mt-5">
+              <div className="mt-5">
                 <h1 className="font-body font-bold text-white text-xl md:text-2xl">
                   {sertifikat.name}
                 </h1>
@@ -64,41 +85,40 @@ const Sertifikat = () => {
                 <h1 className="font-body font-medium text-white text-base">
                   {sertifikat.tanggal_kegiatan}
                 </h1>
+                <button
+                  onClick={() => toggleForm(sertifikat.id)}
+                  style={{
+                    backgroundColor: hexToRgba(sertifikat.color, 0.8),
+                    borderColor: sertifikat.color,
+                  }}
+                  className="flex mt-3 font-body duration-300 py-1 px-4 md:px-5 bg-[#0D6B91] border border-[#0D6B91] hover:bg-[#082F44] text-white rounded-md shadow-md gap-3 text-lg items-center"
+                >
+                  Lihat Detail<BsArrowRightSquareFill />
+                </button>
               </div>
-            </div>
-            <div
-            style={{ backgroundColor: sertifikat.color }}
-             className="text-white  font-body mt-5 py-2 md:py-4 px-4 md:px-8 rounded-md absolute">
-              <h1>{sertifikat.bagian}</h1>
-            </div>
-            <div>
-              <img
-                src={sertifikat.link_foto}
-                className="md:mt-24 mt-20 rounded-lg shadow-md"
-                alt=""
-              />
-            </div>
+            </figure>
           </div>
-          <div className="md:w-1/2 h-full md:p-10 px-5 pb-5">
-            <h1 className="font-bold text-white font-body text-xl md:text-2xl">
-              Competencies acquired:
-            </h1>
-            <ul className="font-body mt-3 text-white list-outside text-base">
-              {sertifikat.deskripsi
-                .replace(/\\n/g, "\n")
-                .replace(/\\/g, "")
-                .replace(/"/g, "")
-                .split("\n")
-                .map((item, index) => (
-                  <li key={index} className="flex items-center">
-                    <span className="bulleted-text mr-2">•</span>
-                    <span className="flex-1">{item}</span>
-                  </li>
-                ))}
-            </ul>
-          </div>
+        ))}
+      </div>
+      
+      {window.innerWidth < 768 && sertifikat.length > 3 && (
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => setShowAll(!showAll)}
+            className="bg-[#0D6B91] text-white w-64 max-md:mb-5 px-12 py-2 rounded-md font-body font-semibold hover:bg-opacity-80 transition-all duration-300"
+          >
+            {showAll ? "Lebih Sedikit" : "Lihat Semuanya"}
+          </button>
         </div>
-      ))}
+      )}
+
+      {showForm && (
+        <DetailSertifikat
+          showForm={showForm}
+          toggleCloseForm={toggleCloseForm}
+          sertifikatId={selectedSertifikatId}
+        />
+      )}
     </div>
   );
 };

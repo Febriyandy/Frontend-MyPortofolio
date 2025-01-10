@@ -4,92 +4,110 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
 const EditProject = ({ showForm, toggleCloseForm, projectId }) => {
-  const [name, setName] = useState("");
-  const [deskripsi, setDeskripsi] = useState("");
-  const [bahasa_pemrograman, setBahasa_pemrograman] = useState([]);
-  const [link_github, setLink_github] = useState("");
-  const [link_preview, setLink_preview] = useState("");
-  const [foto, setFoto] = useState(null);
-  const [msg, setMsg] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    deskripsi: "",
+    bahasa_pemrograman: [],
+    link_github: "",
+    link_preview: "",
+    foto: null
+  });
+  const [skills, setSkills] = useState([]);
   const [preview, setPreview] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const loadImage = (e) => {
     const image = e.target.files[0];
-    setFoto(image);
-    setPreview(URL.createObjectURL(image));
+    if (image) {
+      setFormData(prev => ({ ...prev, foto: image }));
+      setPreview(URL.createObjectURL(image));
+    }
   };
 
   const getProjectById = async () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL}/project/${projectId}`);
       if (response.data) {
-        const data = response.data;
-
-        setName(data.name || "");
-        setDeskripsi(data.deskripsi || "");
-        setLink_github(data.link_github || "");
-        setLink_preview(data.link_preview || "");
+        const { name, deskripsi, bahasa_pemrograman, link_github, link_preview, link_foto } = response.data;
         
         // Clean and parse the bahasa_pemrograman data
-        const cleanedSkills = data.bahasa_pemrograman
-          .replace(/\\|"|\[|\]/g, "")
-          .split(",")
-          .map(skill => skill.trim());
-        setBahasa_pemrograman(cleanedSkills || []);
+        const cleanedSkills = bahasa_pemrograman
+          ? bahasa_pemrograman.replace(/\\|"|\[|\]/g, "")
+              .split(",")
+              .map(skill => skill.trim())
+              .filter(Boolean)
+          : [];
 
-        setFoto(data.link_foto || null);
-        setPreview(data.link_foto || "");
+        setFormData({
+          name: name || "",
+          deskripsi: deskripsi || "",
+          bahasa_pemrograman: cleanedSkills,
+          link_github: link_github || "",
+          link_preview: link_preview || "",
+          foto: null
+        });
+        setPreview(link_foto || "");
       }
     } catch (error) {
+      setError("Error fetching project data");
       console.error("Error getting data:", error);
     }
   };
 
-  const skills = [
-    "HTML",
-    "CSS",
-    "JavaScript",
-    "TailwindCSS",
-    "Bootstrap",
-    "React JS",
-    "PHP",
-    "Flutter",
-  ];
+  const getSkills = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/skill`);
+      setSkills(response.data);
+    } catch (error) {
+      setError("Error fetching skills");
+      console.error("Error fetching skills:", error);
+    }
+  };
 
   useEffect(() => {
+    getSkills();
     if (projectId) {
       getProjectById();
     }
   }, [projectId]);
 
-  const handleCheckboxChange = (event) => {
-    const { value, checked } = event.target;
-    if (checked) {
-      setBahasa_pemrograman((prevSkills) => [...prevSkills, value]);
-    } else {
-      setBahasa_pemrograman((prevSkills) =>
-        prevSkills.filter((skill) => skill !== value)
-      );
-    }
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleCheckboxChange = (value, checked) => {
+    setFormData(prev => ({
+      ...prev,
+      bahasa_pemrograman: checked
+        ? [...prev.bahasa_pemrograman, value]
+        : prev.bahasa_pemrograman.filter(skill => skill !== value)
+    }));
   };
 
   const editData = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("deskripsi", deskripsi);
-      formData.append("bahasa_pemrograman", JSON.stringify(bahasa_pemrograman)); // Convert to JSON string
-      formData.append("link_github", link_github);
-      formData.append("link_preview", link_preview);
-      formData.append("foto", foto);
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "bahasa_pemrograman") {
+          formDataToSend.append(key, JSON.stringify(value));
+        } else if (value != null) {
+          formDataToSend.append(key, value);
+        }
+      });
 
       await axios.patch(
         `${import.meta.env.VITE_API_URL}/updateproject/${projectId}`,
-        formData
+        formDataToSend
       );
+
       Swal.fire({
         icon: "success",
         title: "Data Berhasil Diedit!",
@@ -102,114 +120,116 @@ const EditProject = ({ showForm, toggleCloseForm, projectId }) => {
         window.location.reload();
       }, 2000);
     } catch (error) {
+      setError("Failed to update project");
       console.error("Error editing data:", error);
-      setMsg("Failed to update skill");
     }
   };
 
+  if (!showForm) return null;
+
   return (
-    <>
-      {showForm && (
-        <form onSubmit={editData}>
-          <div className="fixed z-[1000] top-0 left-0 p-5 w-full h-screen bg-transparent backdrop-filter backdrop-blur-sm shadow-sm flex items-center justify-center">
-            <div className="w-2/3 h-4/5 bg-white shadow-2xl rounded-xl p-7">
-              <h1 className="text-xl font-medium pb-3">Edit Data Project</h1>
-              <div className="flex">
-                <div className="w-1/2 pr-5">
-                  <input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full py-3 border border-[#0D6B91] bg-white shadow-md rounded-md outline-none px-3"
-                    type="text"
-                    placeholder="Masukan Nama Project"
-                  />
-                  <textarea
-                    value={deskripsi}
-                    onChange={(e) => setDeskripsi(e.target.value)}
-                    className="w-full py-3 mt-5 border border-[#0D6B91] bg-white shadow-md rounded-md outline-none px-3"
-                    placeholder="Deskripsi"
-                  />
-                  <input
-                    value={link_github}
-                    onChange={(e) => setLink_github(e.target.value)}
-                    className="w-full my-5 py-3 border border-[#0D6B91] bg-white shadow-md rounded-md outline-none px-3"
-                    type="text"
-                    placeholder="Masukan Link Repository"
-                  />
-                  <input
-                    value={link_preview}
-                    onChange={(e) => setLink_preview(e.target.value)}
-                    className="w-full py-3 border border-[#0D6B91] bg-white shadow-md rounded-md outline-none px-3"
-                    type="text"
-                    placeholder="Masukan Link Preview"
-                  />
-                  <div className="flex gap-3 float-right">
-                    <button
-                      className="bg-[#0D6B91] py-2 px-6 text-white text-lg rounded-md shadow-md hover:bg-[#15a4dd] mt-4"
-                      onClick={toggleCloseForm}
-                    >
-                      Batal
-                    </button>
-                    <button
-                      type="submit"
-                      className="bg-[#0D6B91] py-2 px-6 text-white text-lg rounded-md shadow-md hover:bg-[#15a4dd] mt-4"
-                    >
-                      Simpan
-                    </button>
-                  </div>
-                </div>
-                <div className="w-1/2 pl-5">
-                  <label className="font-medium">Pilih Bahasa Pemrograman Yang Digunakan</label>
-                  <div className="flex flex-wrap mt-5">
-                    {skills.map((skill) => (
-                      <div key={skill} className="w-1/3 mb-2">
-                        <label className="inline-flex items-center">
-                          <input
-                            type="checkbox"
-                            value={skill}
-                            checked={bahasa_pemrograman.includes(skill)}
-                            onChange={handleCheckboxChange}
-                            className="form-checkbox h-5 w-5 text-blue-600"
-                          />
-                          <span className="ml-2">{skill}</span>
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="w-full h-48">
-                    <div className="w-2/3 border border-[#0D6B91] h-36 rounded-md bg-white">
-                      {preview ? (
-                        <figure>
-                          <img
-                            className="rounded-md object-cover w-full h-36"
-                            src={preview}
-                            alt="Preview"
-                          />
-                        </figure>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                    <div className="mt-3">
-                      <span className="border absolute border-[#0D6B91] cursor-pointer py-2 px-20 rounded-md shadow-md">
-                        Pilih File Foto
-                      </span>
-                      <input
-                        onChange={loadImage}
-                        type="file"
-                        id="fileInput"
-                        className="h-10 w-64 opacity-0 bg-blue-200 z-[1000] relative cursor-pointer"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {msg && <p className="text-red-500 text-sm mt-3">{msg}</p>}
+    <div className="fixed inset-0 z-[1000] p-5 bg-black/20 backdrop-blur-sm flex items-center justify-center">
+      <form onSubmit={editData} className="w-2/3 h-full bg-white shadow-2xl rounded-xl p-7 overflow-y-auto">
+        <h1 className="text-xl font-medium pb-3">Edit Data Project</h1>
+        <div className="flex flex-col md:flex-row gap-5">
+          <div className="w-full md:w-1/2">
+            <input
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              className="w-full py-3 border border-[#0D6B91] bg-white shadow-md rounded-md outline-none px-3"
+              type="text"
+              placeholder="Masukan Nama Project"
+            />
+            <textarea
+              name="deskripsi"
+              value={formData.deskripsi}
+              onChange={handleInputChange}
+              className="w-full h-44 py-3 mt-5 border border-[#0D6B91] bg-white shadow-md rounded-md outline-none px-3"
+              placeholder="Deskripsi"
+            />
+            <input
+              name="link_github"
+              value={formData.link_github}
+              onChange={handleInputChange}
+              className="w-full my-5 py-3 border border-[#0D6B91] bg-white shadow-md rounded-md outline-none px-3"
+              type="text"
+              placeholder="Masukan Link Repository"
+            />
+            <input
+              name="link_preview"
+              value={formData.link_preview}
+              onChange={handleInputChange}
+              className="w-full py-3 border border-[#0D6B91] bg-white shadow-md rounded-md outline-none px-3"
+              type="text"
+              placeholder="Masukan Link Preview"
+            />
+            <div className="flex gap-3 justify-end mt-4">
+              <button
+                type="button"
+                className="bg-gray-500 py-2 px-6 text-white text-lg rounded-md shadow-md hover:bg-gray-600"
+                onClick={toggleCloseForm}
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                className="bg-[#0D6B91] py-2 px-6 text-white text-lg rounded-md shadow-md hover:bg-[#15a4dd]"
+              >
+                Simpan
+              </button>
             </div>
           </div>
-        </form>
-      )}
-    </>
+          
+          <div className="w-full md:w-1/2">
+            <label className="font-medium block mb-3">
+              Pilih Bahasa Pemrograman Yang Digunakan
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {skills.map((skill) => (
+                <label key={skill.id} className="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    value={skill.name}
+                    checked={formData.bahasa_pemrograman.includes(skill.name)}
+                    onChange={(e) => handleCheckboxChange(skill.name, e.target.checked)}
+                    className="form-checkbox h-5 w-5 text-blue-600"
+                  />
+                  <span className="ml-2">{skill.name}</span>
+                </label>
+              ))}
+            </div>
+            
+            <div className="mt-8">
+              <div className="w-2/3 border border-[#0D6B91] h-36 rounded-md bg-white">
+                {preview && (
+                  <img
+                    className="rounded-md object-cover w-full h-36"
+                    src={preview}
+                    alt="Preview"
+                  />
+                )}
+              </div>
+              <div className="mt-3 relative">
+                <label className="border border-[#0D6B91] cursor-pointer py-2 px-20 rounded-md shadow-md inline-block">
+                  Pilih File Foto
+                  <input
+                    type="file"
+                    onChange={loadImage}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    accept="image/*"
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {error && (
+          <p className="text-red-500 text-sm mt-3">{error}</p>
+        )}
+      </form>
+    </div>
   );
 };
 

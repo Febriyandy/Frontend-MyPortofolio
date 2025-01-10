@@ -1,210 +1,209 @@
 import React, { useState, useEffect } from "react";
-import Elemen from "../assets/elemen.png";
-import Navbar from "../components/Navbar";
-import axios from "axios";
 import { Link } from "react-router-dom";
-import { FaInstagram } from "react-icons/fa";
-import { CiLinkedin } from "react-icons/ci";
-import { LuGithub } from "react-icons/lu";
-import { MdOutlineMail } from "react-icons/md";
-import { FaXTwitter } from "react-icons/fa6";
-import { FiFacebook } from "react-icons/fi";
-import { TbBrandTiktok } from "react-icons/tb";
-import { TbBrandDiscord } from "react-icons/tb";
-import Foto from "../assets/foto3.jpg";
+import axios from "axios";
 import Swal from "sweetalert2";
+import { 
+  FaInstagram, 
+  FaXTwitter 
+} from "react-icons/fa6";
+import { 
+  CiLinkedin 
+} from "react-icons/ci";
+import { 
+  LuGithub 
+} from "react-icons/lu";
+import { 
+  MdOutlineMail 
+} from "react-icons/md";
+import { 
+  FiFacebook 
+} from "react-icons/fi";
+import { 
+  TbBrandTiktok,
+  TbBrandDiscord 
+} from "react-icons/tb";
+
+import Navbar from "../components/Navbar";
+import elementBg from "../assets/elemen.png";
+
+const INITIAL_FORM_STATE = {
+  nama: "",
+  email: "",
+  no_hp: "",
+  perusahaan: "",
+  pesan: ""
+};
 
 const Kontak = () => {
-  const [nama, setNama] = useState("");
-  const [email, setEmail] = useState("");
-  const [no_hp, setNo_hp] = useState("");
-  const [perusahaan, setPerusahaan] = useState("");
-  const [pesan, setPesan] = useState("");
-  const [msg, setMsg] = useState("");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+  const [error, setError] = useState("");
 
-  const saveData = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    document.title = "Kontak";
+    fetchUserData();
+  }, []);
 
+  const fetchUserData = async () => {
     try {
-      const formData = new FormData();
-      formData.append("nama", nama);
-      formData.append("email", email);
-      formData.append("no_hp", no_hp);
-      formData.append("perusahaan", perusahaan);
-      formData.append("pesan", pesan);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/users/1`);
+      setUser(response.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setError("Failed to load user data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      await axios.post(`${import.meta.env.VITE_API_URL}/kontak`, formData);
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formDataToSend = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSend.append(key, value);
+      });
+
+      await axios.post(`${import.meta.env.VITE_API_URL}/kontak`, formDataToSend);
+      
       Swal.fire({
         icon: "success",
         title: "Pesan Terkirim!",
         showConfirmButton: false,
-        timer: 2000,
+        timer: 2000
       });
 
-      // Kosongkan form setelah berhasil terkirim
-      setNama("");
-      setEmail("");
-      setNo_hp("");
-      setPerusahaan("");
-      setPesan("");
-      setMsg("");
-
+      setFormData(INITIAL_FORM_STATE);
+      setError("");
     } catch (error) {
-      if (error.response) {
-        const errorMessage = error.response.data.msg;
-        setMsg(errorMessage);
-
-        Swal.fire({
-          icon: "error",
-          title: "Gagal Mengirim Pesan!",
-          text: errorMessage,
-        });
-      } else {
-        console.error("Unexpected error:", error);
-
-        Swal.fire({
-          icon: "error",
-          title: "Gagal Mengirim Pesan!",
-          text: "Terjadi kesalahan",
-        });
-      }
+      const errorMessage = error.response?.data?.msg || "Terjadi kesalahan";
+      setError(errorMessage);
+      
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Mengirim Pesan!",
+        text: errorMessage
+      });
     }
   };
 
-  useEffect(() => {
-    document.title = 'Kontak';
-  }, []);
+  const renderSocialLink = (url, Icon, label) => {
+    if (!url) return null;
+    
+    return (
+      <Link
+        to={url}
+        className="text-2xl p-1 hover:bg-[#0D6B91] duration-300 hover:text-white rounded-md text-[#0D6B91]"
+        aria-label={label}
+      >
+        <Icon />
+      </Link>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full h-80 bg-[#0E1F2A] flex items-center justify-center">
+        <p className="text-white">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <>
       <Navbar />
       <section className="relative h-screen">
         <img
-          src={Elemen}
+          src={elementBg}
           className="w-full h-full absolute top-0 left-0 object-cover"
-          alt=""
+          alt="Background pattern"
         />
         <div className="relative z-10 container md:flex mx-auto max-md:px-5 py-10">
+          {/* Profile Section */}
           <div className="md:w-1/2 animate__animated animate__zoomIn flex flex-col">
-            <h1 className="md:text-3xl max-md:-mt-2 text-xl md:mt-16 text-[#0D6B91] font-body font-bold  mb-8">
-              <span role="img" aria-label="target">
-                👋
-              </span>{" "}
-              Contact Me
+            <h1 className="md:text-3xl max-md:-mt-2 text-xl md:mt-16 text-[#0D6B91] font-body font-bold mb-8">
+              <span role="img" aria-label="wave">👋</span> Contact Me
             </h1>
-            <div className=" items-center gap-5  md:ml-5">
-              <img src={Foto} className="md:w-1/3   w-2/3 mx-auto rounded-lg shadow-lg" alt="" />
-              <div>
-                <h1 className="font-body font-bold text-2xl max-md:pt-4 text-center md:text-4xl md:py-3 text-[#05A9D5]">
-                  Febriandi
+            <div className="items-center gap-5 md:ml-5">
+              <img 
+                src={user?.url_photo_contact} 
+                className="md:w-1/3 w-2/3 mx-auto rounded-lg shadow-lg" 
+                alt={`${user?.username}'s profile`}
+              />
+              <div className="text-center mt-4">
+                <h1 className="font-body font-bold text-2xl max-md:pt-4 md:text-4xl md:py-3 text-[#05A9D5]">
+                  {user?.username}
                 </h1>
-                <h1 className="font-body font-bold text-3xl md:text-4xl text-center text-[#0D6B91]">
-                  Full-stack Developer
-                </h1>
+                <h2 className="font-body font-bold text-3xl md:text-4xl text-[#0D6B91]">
+                  {user?.title_role}
+                </h2>
+                
+                {/* Social Media Links - First Row */}
                 <div className="flex justify-center mt-4 font-body gap-5">
-                  <Link
-                    to="https://www.facebook.com/febriyandy.f?mibextid=ZbWKwL"
-                    className="text-2xl p-1 hover:bg-[#0D6B91] duration-300 hover:text-white rounded-md text-[#0D6B91]"
-                  >
-                    <FiFacebook />
-                  </Link>
-                  <Link
-                    to="https://www.instagram.com/fbryndy_?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
-                    className="text-2xl p-1 hover:bg-[#0D6B91] duration-300 hover:text-white rounded-md text-[#0D6B91]"
-                  >
-                    <FaInstagram />
-                  </Link>
-                  <Link
-                    to="https://x.com/febriyandyy_?t=nkA8j5TX7XYKwUcCHmvbyQ&s=09"
-                    className="text-2xl p-1 hover:bg-[#0D6B91] duration-300 hover:text-white rounded-md text-[#0D6B91]"
-                  >
-                    <FaXTwitter />
-                  </Link>
-                  <Link
-                    to="https://www.tiktok.com/@febriyandy.f?_t=8mkUNtQPWef&_r=1"
-                    className="text-2xl p-1 hover:bg-[#0D6B91] duration-300 hover:text-white rounded-md text-[#0D6B91]"
-                  >
-                    <TbBrandTiktok />
-                  </Link>
+                  {renderSocialLink(user?.url_fb, FiFacebook, "Facebook")}
+                  {renderSocialLink(user?.url_ig, FaInstagram, "Instagram")}
+                  {renderSocialLink(user?.url_x, FaXTwitter, "Twitter")}
+                  {renderSocialLink(user?.url_tiktok, TbBrandTiktok, "TikTok")}
                 </div>
+                
+                {/* Social Media Links - Second Row */}
                 <div className="flex justify-center mt-4 font-body gap-5">
-                  <Link
-                    to="https://www.linkedin.com/in/febriandi-febri-753126222/"
-                    className="text-2xl p-1 hover:bg-[#0D6B91] duration-300 hover:text-white rounded-md text-[#0D6B91]"
-                  >
-                    <CiLinkedin />
-                  </Link>
-                  <Link
-                    to="https://github.com/Febriyandy"
-                    className="text-2xl p-1 hover:bg-[#0D6B91] duration-300 hover:text-white rounded-md text-[#0D6B91]"
-                  >
-                    <LuGithub />
-                  </Link>
-                  <Link
-                    to=""
-                    className="text-2xl p-1 hover:bg-[#0D6B91] duration-300 hover:text-white rounded-md text-[#0D6B91]"
-                  >
-                    <TbBrandDiscord />
-                  </Link>
-                  <Link
-                    to="mailto:febriandini@gmail.com"
-                    className="text-2xl p-1 hover:bg-[#0D6B91] duration-300 hover:text-white rounded-md text-[#0D6B91]"
-                  >
-                    <MdOutlineMail />
-                  </Link>
+                  {renderSocialLink(user?.url_linkedin, CiLinkedin, "LinkedIn")}
+                  {renderSocialLink(user?.url_github, LuGithub, "GitHub")}
+                  {renderSocialLink(user?.url_discord, TbBrandDiscord, "Discord")}
+                  {renderSocialLink(`mailto:${user?.url_email}`, MdOutlineMail, "Email")}
                 </div>
               </div>
             </div>
           </div>
-          <div  className="md:w-1/2 animate__animated animate__zoomIn  max-md:z-10 mt-10 mx-auto md:mt-16 p-5 md:px-10 md:py-10 flex flex-col bg-white/10 backdrop-filter backdrop-blur-sm shadow-lg rounded-xl items-center">
-          <h1 className="md:text-3xl text-xl mt-15 text-[#0D6B91] font-body font-bold  mb-2">Form Contact Me</h1>
-            <form onSubmit={saveData} className="md:w-4/5">
-              <input
-                type="text"
-                id="nama"
-                value={nama}
-                onChange={(e) => setNama(e.target.value)}
-                placeholder="Nama"
-                className="w-full py-2 px-3 mb-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#05A9D5] focus:ring-1 focus:ring-[#05A9D5] font-body"
-              />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                id="email"
-                placeholder="Alamat Email"
-                className="w-full py-2 px-3 mb-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#05A9D5] focus:ring-1 focus:ring-[#05A9D5] font-body"
-              />
-              <input
-                type="tel"
-                value={no_hp}
-                onChange={(e) => setNo_hp(e.target.value)}
-                id="telepon"
-                placeholder="628......"
-                className="w-full py-2 px-3 mb-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#05A9D5] focus:ring-1 focus:ring-[#05A9D5] font-body"
-              />
-              <input
-                type="text"
-                value={perusahaan}
-                onChange={(e) => setPerusahaan(e.target.value)}
-                id="perusahaan"
-                placeholder="Perusahaan (Opsional)"
-                className="w-full py-2 px-3 mb-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#05A9D5] focus:ring-1 focus:ring-[#05A9D5] font-body"
-              />
-              <textarea
-                id="pesan"
-                value={pesan}
-                onChange={(e) => setPesan(e.target.value)}
-                placeholder="Pesan"
-                className="w-full h-32 py-1 px-3 mb-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#05A9D5] focus:ring-1 focus:ring-[#05A9D5] font-body placeholder-top transition-transform duration-300 ease-out focus:placeholder-translate-y-full"
-              />
+
+          {/* Contact Form Section */}
+          <div className="md:w-1/2 animate__animated animate__zoomIn max-md:z-10 mt-10 mx-auto md:mt-16 p-5 md:px-10 md:py-10 flex flex-col bg-white/10 backdrop-filter backdrop-blur-sm shadow-lg rounded-xl items-center">
+            <h2 className="md:text-3xl text-xl mt-15 text-[#0D6B91] font-body font-bold mb-2">
+              Form Contact Me
+            </h2>
+            <form onSubmit={handleSubmit} className="md:w-4/5">
+              {Object.entries(formData).map(([key, value]) => (
+                key !== "pesan" ? (
+                  <input
+                    key={key}
+                    type={key === "email" ? "email" : key === "no_hp" ? "tel" : "text"}
+                    id={key}
+                    value={value}
+                    onChange={handleInputChange}
+                    placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                    className="w-full py-2 px-3 mb-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#05A9D5] focus:ring-1 focus:ring-[#05A9D5] font-body"
+                    required={key !== "perusahaan"}
+                  />
+                ) : (
+                  <textarea
+                    key={key}
+                    id={key}
+                    value={value}
+                    onChange={handleInputChange}
+                    placeholder="Pesan"
+                    className="w-full h-32 py-1 px-3 mb-3 rounded-lg border border-slate-300 focus:outline-none focus:border-[#05A9D5] focus:ring-1 focus:ring-[#05A9D5] font-body placeholder-top transition-transform duration-300 ease-out focus:placeholder-translate-y-full"
+                    required
+                  />
+                )
+              ))}
+              
               <div className="mt-2 flex justify-center">
-                  <button
-                    type="submit"
-                    className="font-body py-2 px-7 w-full rounded-md text-white hover:bg-[#0D6B91] bg-[#05A9D5]"
-                  >
-                    Kirim
-                  </button>
+                <button
+                  type="submit"
+                  className="font-body py-2 px-7 w-full rounded-md text-white hover:bg-[#0D6B91] bg-[#05A9D5]"
+                >
+                  Kirim
+                </button>
               </div>
             </form>
           </div>

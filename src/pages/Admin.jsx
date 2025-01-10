@@ -11,6 +11,8 @@ import DataSertifikat from "../components/DataSertifikat";
 import TambahDataArtikel from "../components/TambahDataArtikel";
 import DataArtikel from "../components/DataArtikel";
 import DataKontak from "../components/DataKontak";
+import DataUsers from "../components/DataUsers";
+
 import { BiLogOut } from "react-icons/bi";
 
 
@@ -113,6 +115,11 @@ const Admin = () => {
         <h1 className="text-3xl font-bold text-[#0D6B91] pt-10">
           Selamat Datang di Admin Portofolio Febriandi
         </h1>
+        <div className="w-full h-auto py-5 px-32">
+          <div>
+            <DataUsers />
+          </div>
+        </div>
         <div className="w-full h-auto py-5 px-32">
           <div className="w-full flex justify-between h-auto bg-white">
             <h1 className="font-body font-semibold text-xl text-[#0D6B91]">
